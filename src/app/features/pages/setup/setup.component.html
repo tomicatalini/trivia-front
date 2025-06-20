@@ -1,0 +1,167 @@
+<section>
+    <h2 class="text-xl font-bold mb-4">Configuración del juego</h2>
+
+    <mat-accordion class="example-headers-align" multi>
+
+        <!-- Fuente de Preguntas -->
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title> Fuente de Preguntas </mat-panel-title>
+                <mat-panel-description>
+                    {{isQuizAvailable() ? selectedQuiz()?.name : 'Seleccionar fuente de preguntas'}}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (isMultipleQuiz()) {
+                <p>No hay fuentes de preguntas disponibles</p>
+            } @else if (isQuizAvailable() && isSingleQuiz()) {
+                <p>Unica fuente de preguntas disponible: {{selectedQuiz()?.name}}</p>
+            } @else {
+                <div>
+                    @for (quiz of quizList(); track $index) {
+                        <div class="outline">
+                            <h3>{{quiz.name}}</h3>
+                            <span>{{quiz.id}}</span>
+                            <p>{{quiz.url}}</p>
+                        </div>
+                    }
+                </div>
+            }
+            
+
+        </mat-expansion-panel>
+
+        <!-- Categorías -->
+        <mat-expansion-panel [disabled]="!isQuizAvailable()">
+            <mat-expansion-panel-header>
+                <mat-panel-title> Categorias </mat-panel-title>
+                <mat-panel-description>
+                    {{isCategoryAvailable() ? selectedCategory()?.category : 'No hay categorias disponibles'}}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <section class="w-full h-full flex flex-wrap p-4">
+                @if (hasCategories()) {
+                    @for (c of categoryList(); track $index) {
+
+                        @if (c.enable) {
+                            @if (c.id === selectedCategory()?.id) {
+                                <div class="w-fit py-2 px-4 border rounded-full m-1 hover:cursor-pointer bg-blue-500"
+                                    (click)="handleCategorySelection(c)">{{ c.category }}
+                                </div>
+                            } @else {
+                                <div class="w-fit py-2 px-4 border rounded-full m-1 hover:cursor-pointer hover:bg-blue-500"
+                                    (click)="handleCategorySelection(c)">{{ c.category }}
+                                </div>
+                            }
+                        }
+                    }
+                } @else {
+                    <p>No hay categorías disponibles.</p>
+                }
+            </section>
+        </mat-expansion-panel>
+
+        <!-- Modo de juego -->
+        <mat-expansion-panel [disabled]="!isQuizAvailable()">
+            <mat-expansion-panel-header>
+                <mat-panel-title> Modo de juego </mat-panel-title>
+                <mat-panel-description>
+                    {{isGameModeAvailable() ? gameMode()?.field : 'seleccionar modo de juego'}}
+                    <!-- <mat-icon>date_range</mat-icon> -->
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                @for (mode of modos; track $index) {
+                    <div class="border rounded-lg p-4 hover:shadow cursor-pointer"
+                        (click)="handleGameModeSelection(mode)"                
+                        [class.border-blue-600]="mode.name === gameMode()?.name"
+                    >
+                        <h4 class="font-bold">{{ mode.field }}</h4>
+                        <p class="text-sm text-gray-600">{{ mode.description }}</p>
+                    </div>
+                }
+            </div>
+
+        </mat-expansion-panel>
+
+        <!-- Cantidad de preguntas -->
+        <mat-expansion-panel [disabled]="!isQuizAvailable()">
+            <mat-expansion-panel-header>
+                <mat-panel-title> Cantidad de preguntas </mat-panel-title>
+                <mat-panel-description>
+                    {{isQuestionCount() ? questionCount() : 'seleccionar cantidad de preguntas'}}
+                    <!-- <mat-icon>date_range</mat-icon> -->
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+        </mat-expansion-panel>
+</mat-accordion>
+
+    <!-- Fuente de Trivia -->
+    <!-- <mat-form-field appearance="fill" class="w-full mb-4">
+    <mat-label>Fuente de preguntas</mat-label>
+    <mat-select [(ngModel)]="fuenteTrivia">
+        <mat-option *ngFor="let fuente of fuentes" [value]="fuente.id">{{ fuente.nombre }}</mat-option>
+    </mat-select>
+    </mat-form-field> -->
+
+    <!-- Categorías (chips o pills) -->
+    <!-- <div class="mb-4">
+    <h3 class="mb-2 font-semibold">Categoría</h3>
+    <div class="flex flex-wrap gap-2">
+        <button
+        *ngFor="let cat of categorias"
+        (click)="seleccionarCategoria(cat)"
+        [class.bg-blue-500]="cat.id === categoriaSeleccionada?.id"
+        class="px-3 py-1 rounded-full border hover:bg-blue-100 transition"
+        >
+        {{ cat.nombre }}
+        </button>
+    </div>
+    </div> -->
+
+    <!-- Modos de juego -->
+    <!-- <div class="mb-4">
+    <h3 class="mb-2 font-semibold">Modo de juego</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+        <div
+        *ngFor="let modo of modos"
+        (click)="seleccionarModo(modo)"
+        class="border rounded-lg p-4 hover:shadow cursor-pointer"
+        [class.border-blue-600]="modo.id === modoSeleccionado?.id"
+        >
+        <h4 class="font-bold">{{ modo.nombre }}</h4>
+        <p class="text-sm text-gray-600">{{ modo.descripcion }}</p>
+        </div>
+    </div>
+    <p *ngIf="modoSeleccionado?.id === 'ayuda'" class="mt-2 text-blue-500 text-sm cursor-pointer" (click)="verComoJugar()">¿Cómo funcionan los modos?</p>
+    </div> -->
+
+    <!-- Cantidad de preguntas -->
+    <!-- <div class="mb-4">
+    <h3 class="mb-2 font-semibold">Cantidad de preguntas</h3>
+    <div class="flex flex-wrap gap-2">
+        <button
+        *ngFor="let cantidad of cantidadesDisponibles"
+        (click)="seleccionarCantidad(cantidad)"
+        [disabled]="modoSeleccionado?.id === 'facilADificil'"
+        [class.bg-blue-500]="cantidadSeleccionada === cantidad"
+        class="px-3 py-1 rounded-full border hover:bg-blue-100 transition"
+        >
+        {{ cantidad }}
+        </button>
+    </div>
+    <p *ngIf="modoSeleccionado?.id === 'facilADificil'" class="text-sm text-gray-600 mt-2">
+        Este modo selecciona automáticamente 15 preguntas.
+    </p>
+    </div> -->
+
+    <!-- Comenzar -->
+    <button
+        class="mt-6 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
+        (click)="startGame()"> Comenzar
+    </button>
+</section>
+

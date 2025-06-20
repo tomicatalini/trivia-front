@@ -1,0 +1,17 @@
+<header class="pl-2 flex justify-between items-center select-none">
+    <h1 class="font-bold hover:cursor-pointer" routerLink="/home">Trivia Game</h1>
+    <div class="flex gap-1">
+        <p class="self-center">{{userData ? userData.username : ''}}</p>
+        
+        @if (userData?.admin) {
+            <button class="p-2 flex flex-col justify-center hover:cursor-pointer hover:bg-blue-200">
+                <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="settings" class="cursor-pointer"></mat-icon>
+            </button>
+        }
+
+        <button class="p-2 mf-1 flex flex-col justify-center hover:cursor-pointer hover:bg-blue-200" 
+            (click)="logout()">
+            <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="logout" class="cursor-pointer"></mat-icon>
+        </button>
+    </div>
+</header>
