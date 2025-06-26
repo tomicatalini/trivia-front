@@ -56,7 +56,7 @@ export class HomeComponent {
 
   prueba(): void {
     this.triviaService.startGame(
-      this.game()?.quiz?.id!,
+      this.game()!.quizId,
       this.authService.getUserData()?.userId!,
       this.game()?.category?.id!,
       this.modeSelected.toUpperCase(),

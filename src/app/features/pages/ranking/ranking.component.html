@@ -1,0 +1,56 @@
+<section>
+    <h2 class="text-2xl font-semibold mb-4 text-center">🏆 Ranking Top 20</h2>
+
+    <table mat-table [dataSource]="dataSource" class="w-full border border-gray-200 rounded-lg overflow-hidden shadow-lg !bg-white" matSort>
+        <!-- Posición -->
+        <ng-container matColumnDef="position">
+        <th mat-header-cell *matHeaderCellDef class="!bg-blue-100 !text-blue-800 !p-4 text-left">#</th>
+        <td mat-cell *matCellDef="let el; let i = index" class="!p-4 text-lg font-bold">{{ getMedal(i) || i + 1 }}</td>
+        </ng-container>
+
+        <!-- Usuario -->
+        <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef class="!bg-blue-100 !text-blue-800 !p-4 text-left">Usuario</th>
+            <td mat-cell *matCellDef="let el" class="!p-4 font-medium text-gray-800">{{ el.user.name | uppercase }}</td>
+        </ng-container>
+
+        <!-- Fecha -->
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef class="!bg-blue-100 !text-blue-800 !p-4 text-left">Fecha</th>
+            <td mat-cell *matCellDef="let el" class="!p-4">{{ getDateString(el.date) }}</td>
+        </ng-container>
+
+        <!-- Tiempo -->
+        <ng-container matColumnDef="time">
+            <th mat-header-cell *matHeaderCellDef class="!bg-blue-100 !text-blue-800 !p-4 text-left">Tiempo</th>
+            <td mat-cell *matCellDef="let el" class="!p-4">{{ el.time }}</td>
+        </ng-container>
+
+        <!-- Puntaje -->
+        <ng-container matColumnDef="score">
+            <th mat-header-cell *matHeaderCellDef class="!bg-blue-100 !text-blue-800 !p-4 text-right">Puntaje</th>
+            <td
+                mat-cell
+                *matCellDef="let el"
+                class="!p-4 text-right text-lg font-extrabold tracking-wide"
+                [ngClass]="{
+                '!text-green-700': el.score >= 400,
+                '!text-yellow-700': el.score >= 300 && el.score < 400,
+                '!text-red-600': el.score < 300
+                }"
+            >
+                {{ el.score }}
+            </td>
+        </ng-container>
+
+        <tr mat-header-row
+            *matHeaderRowDef="displayedColumns"
+            class="!bg-blue-50"
+        ></tr>
+        <tr mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            class="hover:!bg-blue-50 transition duration-200"
+        ></tr>
+    </table>
+
+</section>

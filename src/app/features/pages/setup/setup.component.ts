@@ -13,8 +13,9 @@ import { Quiz } from '../../../model/Quiz';
 import { TriviaService } from '../../../core/services/trivia.service';
 import { GameService } from '../../../core/services/game.service';
 import { Category } from '../../../model/Category';
-import { finalize, map, tap } from 'rxjs';
+import { map } from 'rxjs';
 import { Auth } from '../../../model/Auth';
+import { Router } from '@angular/router';
 
 interface GameMode {
   name: String,
@@ -42,6 +43,16 @@ interface GameMode {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SetupComponent {
+  modos: GameMode[] = [
+      { name: 'EASY', field: 'Fácil', description: 'Preguntas fáciles para comenzar.' },
+      { name: 'MEDIUM', field: 'Medio', description: 'Un desafío equilibrado.' },
+      { name: 'HARD', field: 'Difícil', description: 'Solo para expertos.' },
+      { name: 'RANDOM', field: 'Aleatorio', description: 'Dificultad aleatoria.' },
+      { name: 'EASY_TO_HARD', field: 'Fácil a Difícil', description: 'Simula "¿Quién quiere ser millonario?" con 15 preguntas.' }
+  ];
+
+  cantidades: Number[] = [5, 10, 15, 20, 25];
+
   accordion = viewChild.required(MatAccordion);
 
   quizList = signal<Quiz[]>([]);
@@ -50,8 +61,8 @@ export class SetupComponent {
   categoryList = signal<Category[]>([]);
   selectedCategory = signal<Category | null>(null);
 
-  gameMode = signal<GameMode | null>(null);
-  questionCount = signal<Number | null>(15);
+  gameMode = signal<GameMode | null>(this.modos[0]);
+  questionCount = signal<Number | null>(this.cantidades[0]);
  
   readonly isQuizAvailable = computed(() => this.selectedQuiz() != null);
   readonly isSingleQuiz = computed(() => this.quizList().length === 1);
@@ -63,17 +74,10 @@ export class SetupComponent {
   readonly isGameModeAvailable = computed(() => this.gameMode() != null);
   readonly isQuestionCount = computed(() => this.questionCount() != null);
 
-  modos: GameMode[] = [
-    { name: 'EASY', field: 'Fácil', description: 'Preguntas fáciles para comenzar.' },
-    { name: 'MEDIUM', field: 'Medio', description: 'Un desafío equilibrado.' },
-    { name: 'HARD', field: 'Difícil', description: 'Solo para expertos.' },
-    { name: 'RANDOM', field: 'Aleatorio', description: 'Dificultad aleatoria.' },
-    { name: 'EASY_TO_HARD', field: 'Fácil a Difícil', description: 'Simula "¿Quién quiere ser millonario?" con 15 preguntas.' }
-  ];
-
   constructor(
     private triviaService: TriviaService,
     private gameService: GameService,
+    private router: Router,
   ) {
     this.loadQuizzes();
 
@@ -98,11 +102,9 @@ export class SetupComponent {
         this.quizList.set(quizzes);
 
         if (quizzes.length === 0) {
-          // Mostrar mensaje: No hay fuentes disponibles
           this.selectedQuiz.set(null);
         } else if (quizzes.length === 1) {
           this.selectedQuiz.set(quizzes[0]);
-          // Mostrar mensaje: Solo hay una fuente, seleccionada automáticamente
         }
       });
   }
@@ -134,12 +136,20 @@ export class SetupComponent {
     if (!quiz || !category || !mode || !count) return;
 
     const auth = JSON.parse(localStorage.getItem('auth_user')!) as Auth;
-
-    console.log(auth);
-
+    
     this.triviaService
       .startGame(quiz.id, auth.userId, category.id, mode.name, count)
-      .subscribe(console.log);
+      .pipe(
+        map(response => response.result)
+      )
+      .subscribe(game => {
+          if(game != null){
+            this.gameService.setGame(game);
+            this.router.navigate(['/home/play']);
+          } else {
+            console.info('Ocurrio un error al obtener la partida');
+          }
+      });
   }
 
   handleCategorySelection(category: Category): void {
@@ -148,6 +158,10 @@ export class SetupComponent {
 
   handleGameModeSelection(gameMode: GameMode): void {
     this.gameMode.set(gameMode);
+  }
+
+  handleNumberQuestionSelection(number: Number): void {
+    this.questionCount.set(number);
   }
 
 }

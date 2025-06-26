@@ -1,1 +1,48 @@
-<p>play works!</p>
+<div>
+    <!-- Header -->
+    <section>
+        <div>Game # {{game()?.gameId}}</div>
+        <div>Cantidad de preguntas {{questionsList().length}}</div>
+        <span>Si la cantidad de preguntas no concuerda con lo configurado es porque no hay suficientes preguntas</span>        
+    </section>
+
+    <!-- Body -->
+    <section>
+        <div class="max-w-xl mx-auto p-4">
+            <app-time-bar [elapsedSeconds]="currentTime"></app-time-bar>
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold">
+                Pregunta {{ currentIndex() + 1 }} de {{ game()?.gameQuestions!.length }}
+                </h2>
+            </div>
+
+            <div class="bg-white shadow p-4 rounded border">
+                <p class="text-lg font-medium mb-4" [innerHTML]="currentQuestion()?.question"></p>
+
+                <div class="grid gap-2">
+                    @for (ans of currentQuestion()?.answers; track $index) {
+                        <button
+                            class="px-4 py-2 border rounded text-left transition"
+                            [ngClass]="getAnswerClass(ans)"
+                            (click)="selectAnswer(ans)"
+                            [disabled]="selectedAnswer()"
+                        >
+                            {{ ans.answer }}
+                        </button>
+                    }
+                </div>
+
+                <div class="mt-4 flex justify-end">
+                <button
+                    (click)="next()"
+                    [disabled]="!selectedAnswer()"
+                    class="bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                    {{ isLastQuestion() ? 'Finalizar' : 'Siguiente' }}
+                </button>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</div>

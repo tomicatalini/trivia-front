@@ -3,12 +3,12 @@ import { GameQuestion } from "./GameQuestion";
 import { Quiz } from "./Quiz";
 
 export interface Game {
-    id?: Number,
-    score?: Number,
-    startDate?: Date,
-    endDate?: Date,
-    userId?: Number,
-    quiz?: Quiz,
-    category?: Category,
-    gameQuestions?: GameQuestion[]
+    gameId: Number,
+    score: Number,
+    startDate: Date,
+    endDate: Date,
+    userId: Number,
+    quizId: Number,
+    category: Category,
+    gameQuestions: GameQuestion[]
 }

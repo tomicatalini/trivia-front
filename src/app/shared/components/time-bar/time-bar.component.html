@@ -1,0 +1,10 @@
+<div class="w-full h-3 bg-gray-200 rounded mb-2 overflow-hidden">
+  <div
+    class="h-full transition-all duration-100 ease-linear"
+    [ngClass]="color()"
+    [style.width.%]="progress()"
+  ></div>
+</div>
+<div class="text-sm text-gray-500 text-right">
+  {{ elapsedSeconds() }}s
+</div>

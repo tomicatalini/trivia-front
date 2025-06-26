@@ -1,6 +1,8 @@
+import { Question } from "./Question";
+
 export interface GameQuestion {
     gameId: Number,
-    questionId: Number,
+    question: Question,
     start: Date,
     finish: Date,
     valid: Boolean

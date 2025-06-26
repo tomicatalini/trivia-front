@@ -1,0 +1,18 @@
+<div class="max-w-xl mx-auto p-6 rounded shadow bg-white text-center">
+  <h2 class="text-2xl font-semibold mb-4 text-blue-700">Resumen del Juego</h2>
+
+  <div class="text-lg space-y-2 mb-6">
+    <p>🏆 <strong>Puntaje:</strong> {{ animatedScore() }}</p>
+    <p>✅ <strong>Respuestas correctas:</strong> {{ correctAnswers }} / {{ totalQuestions }}</p>
+    <p>⏱ <strong>Tiempo total:</strong> {{ totalTime }} segundos</p>
+  </div>
+
+  <div class="flex justify-center gap-4">
+    <button (click)="volverAJugar()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+      Volver a jugar
+    </button>
+    <button (click)="verRanking()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Ver ranking
+    </button>
+  </div>
+</div>

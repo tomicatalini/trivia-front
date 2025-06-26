@@ -1,7 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { ApiResponse } from '../../model/ApiResponse';
+import { GameQuestion } from '../../model/GameQuestion';
 
 const USER_ENDPOINT = 'user';
 const QUIZ_ENDPOINT = 'quiz';
@@ -12,12 +13,11 @@ const GAME_ENDPOINT = 'game';
   providedIn: 'root'
 })
 export class TriviaService {
+  private http = inject(HttpClient);
 
   private baseURL: string = 'http://localhost:8080';
 
-  constructor(
-    private http: HttpClient,
-  ) { }
+  constructor() {}
 
   getAllQuizzies(): Observable<ApiResponse> {
     const endpoint = `${this.baseURL}/${QUIZ_ENDPOINT}`;
@@ -37,7 +37,7 @@ export class TriviaService {
 
   startGame(quizId: Number, playerId: Number, categoryId: Number, level: String, numberOfQuestions: Number): Observable<ApiResponse> {
     const endpoint = `${this.baseURL}/${GAME_ENDPOINT}/start`;
-    console.log(quizId, playerId, categoryId, level, numberOfQuestions);
+    
     const body = {
       quizId,
       playerId,
@@ -47,5 +47,27 @@ export class TriviaService {
     }
 
     return this.http.post(endpoint, body, { responseType: 'json' }) as Observable<ApiResponse>;
+  }
+
+  endGame(quizId: Number, userId: Number, gameId: Number, score: Number, startDate: Date, endDate: Date, gameQuestions: GameQuestion[]): Observable<ApiResponse> {
+    const endpoint = `${this.baseURL}/${GAME_ENDPOINT}/end`;
+
+    const payload = {
+      quizId,
+      userId,
+      gameId,
+      score,
+      startDate,
+      endDate,
+      gameQuestions
+    }
+
+    return this.http.post(endpoint, payload, { responseType: 'json' }) as Observable<ApiResponse>;
+  }
+
+  ranking(): Observable<ApiResponse> {
+    const endpoint = `${this.baseURL}/${GAME_ENDPOINT}/ranking`;
+
+    return this.http.get(endpoint, { responseType: 'json' }) as Observable<ApiResponse>;
   }
 }

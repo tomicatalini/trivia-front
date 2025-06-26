@@ -12,7 +12,7 @@ export class GameService {
 
   constructor() { }
 
-  updateGameStatus(game: Game): void {
+  setGame(game: Game): void {
     this._game.set(game);
   }
 
@@ -21,15 +21,15 @@ export class GameService {
   }
 
   setGameCategory(category: Category): void {
-    const newGame: Game = {...this.game()};
+    const newGame: Game = {...this.game()!};
     newGame.category = category;
 
     this._game.set(newGame);
   }
 
   setGameQuiz(quiz: Quiz): void {
-    const newGame: Game = {...this.game()};
-    newGame.quiz = quiz;
+    const newGame: Game = {...this.game()!};
+    newGame.quizId = quiz.id;
 
     this._game.set(newGame);
   }
