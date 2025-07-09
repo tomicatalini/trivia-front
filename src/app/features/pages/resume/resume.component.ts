@@ -16,20 +16,7 @@ export class ResumeComponent {
 
   game = this.gameService.game();
 
-  animatedScore = signal(0);
-
   ngOnInit(): void {
-    const finalScore: number = (this.game?.score ?? 0) as number;
-    let current: number = 0;
-    const interval = setInterval(() => {
-      if (current >= finalScore) {
-        clearInterval(interval);
-        this.animatedScore.set(finalScore);
-      } else {
-        current += Math.ceil(finalScore / 30);
-        this.animatedScore.set(Math.min(current, finalScore));
-      }
-    }, 200);
 
     setTimeout(() => {
       confetti({
@@ -40,18 +27,20 @@ export class ResumeComponent {
     }, 200);
   }
 
-  get totalQuestions(): number {
+  get totalQuestions(): Number {
     return this.game?.gameQuestions.length ?? 0;
   }
 
-  get correctAnswers(): number {
+  get correctAnswers(): Number {
     return this.game?.gameQuestions.filter(gq => gq.valid).length ?? 0;
   }
 
-  get totalTime(): number {
-    if (!this.game?.startDate || !this.game?.endDate) return 0;
-    const diffMs = new Date(this.game.endDate).getTime() - new Date(this.game.startDate).getTime();
-    return Math.floor(diffMs / 1000); // en segundos
+  get totalTime(): Number {
+    return this.game?.time ?? 0;
+  }
+
+  get score(): Number {
+    return this.game?.score ?? 0;
   }
 
   volverAJugar() {

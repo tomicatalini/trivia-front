@@ -1,121 +1,92 @@
-<section>
-    <h2 class="text-xl font-bold mb-4">Configuración del juego</h2>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6 text-gray-800">
+  <section class="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-xl flex flex-col gap-8 border border-gray-200">
+    <h1 class="text-2xl font-bold text-center text-blue-700 tracking-wide">🎯 Configuración del juego</h1>
 
-    <mat-accordion class="example-headers-align">
+    <!-- Fuente -->
+    <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-gray-700">Fuente de preguntas</label>
 
-        <!-- Fuente de Preguntas -->
-        <mat-expansion-panel >
-            <mat-expansion-panel-header>
-                <mat-panel-title> Fuente de Preguntas </mat-panel-title>
-                <mat-panel-description>
-                    {{isQuizAvailable() ? selectedQuiz()?.name : 'Seleccionar fuente de preguntas'}}
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-
-            @if (isMultipleQuiz()) {
-                <p>No hay fuentes de preguntas disponibles</p>
-            } @else if (isQuizAvailable() && isSingleQuiz()) {
-                <p>Unica fuente de preguntas disponible: {{selectedQuiz()?.name}}</p>
-            } @else {
-                <div>
-                    @for (quiz of quizList(); track $index) {
-                        <div class="outline">
-                            <h3>{{quiz.name}}</h3>
-                            <span>{{quiz.id}}</span>
-                            <p>{{quiz.url}}</p>
-                        </div>
-                    }
-                </div>
-            }
-            
-
-        </mat-expansion-panel>
-
-        <!-- Categorías -->
-        <mat-expansion-panel [disabled]="!isQuizAvailable()">
-            <mat-expansion-panel-header>
-                <mat-panel-title> Categorias </mat-panel-title>
-                <mat-panel-description>
-                    {{isCategoryAvailable() ? selectedCategory()?.category : 'No hay categorias disponibles'}}
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-
-            <section class="w-full h-full flex flex-wrap p-4">
-                @if (hasCategories()) {
-                    @for (c of categoryList(); track $index) {
-
-                        @if (c.enable) {
-                            @if (c.id === selectedCategory()?.id) {
-                                <div class="w-fit py-2 px-4 rounded-md border m-1 hover:cursor-pointer bg-blue-500"
-                                    (click)="handleCategorySelection(c)">{{ c.category }}
-                                </div>
-                            } @else {
-                                <div class="w-fit py-2 px-4 rounded-md border m-1 hover:cursor-pointer hover:bg-blue-500"
-                                    (click)="handleCategorySelection(c)">{{ c.category }}
-                                </div>
-                            }
-                        }
-                    }
-                } @else {
-                    <p>No hay categorías disponibles.</p>
+        @if (sources().length > 0 && selectedSource()) {
+            <select
+                class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                [ngModel]="selectedSource()"
+                (ngModelChange)="selectedSource.set($event)"
+                [disabled]="sources().length === 1"
+            >
+                @for (src of sources(); track src.id) {
+                    <option [value]="src">{{ src.name }}</option>
                 }
-            </section>
-        </mat-expansion-panel>
+            </select>
+        }
+    </div>
 
-        <!-- Modo de juego -->
-        <mat-expansion-panel [disabled]="!isQuizAvailable()">
-            <mat-expansion-panel-header>
-                <mat-panel-title> Modo de juego </mat-panel-title>
-                <mat-panel-description>
-                    {{isGameModeAvailable() ? gameMode()?.field : 'seleccionar modo de juego'}}
-                    <!-- <mat-icon>date_range</mat-icon> -->
-                </mat-panel-description>
-            </mat-expansion-panel-header>
 
-            <div class="grid md:grid-cols-2 gap-4">
-                @for (mode of modos; track $index) {
-                    <div class="border rounded-lg p-4 hover:shadow cursor-pointer"
-                        (click)="handleGameModeSelection(mode)"                
-                        [class.border-blue-600]="mode.name === gameMode()?.name"
-                    >
-                        <h4 class="font-bold">{{ mode.field }}</h4>
-                        <p class="text-sm text-gray-600">{{ mode.description }}</p>
-                    </div>
-                }
-            </div>
+    <!-- Categoría -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-gray-700">Categoría</label>
+      <div class="flex flex-wrap gap-2">
+        @for (cat of categories(); track cat.id) {
+          <button
+            (click)="selectedCategory.set(cat)"
+            [ngClass]="{
+              'bg-blue-600 text-white': selectedCategory()!.id === cat.id,
+              'bg-gray-100 text-gray-800': selectedCategory()!.id !== cat.id
+            }"
+            class="px-4 py-1.5 rounded-full border border-gray-300 text-sm transition cursor-pointer"
+          >
+            {{ cat.category }}
+          </button>
+        }
+      </div>
+    </div>
 
-        </mat-expansion-panel>
+    <!-- Modo de juego -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-gray-700">Modo de juego</label>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        @for (mode of modes; track mode) {
+          <button
+            (click)="selectedMode.set(mode)"
+            [ngClass]="{
+              'bg-blue-500 text-white': selectedMode() === mode,
+              'bg-gray-100 text-gray-800': selectedMode() !== mode
+            }"
+            class="px-4 py-2 rounded-lg border text-sm text-center transition border-gray-300 cursor-pointer"
+          >
+            {{ formatMode(mode) }}
+          </button>
+        }
+      </div>
+    </div>
 
-        <!-- Cantidad de preguntas -->
-        <mat-expansion-panel [disabled]="!isQuizAvailable()">
-            <mat-expansion-panel-header>
-                <mat-panel-title> Cantidad de preguntas </mat-panel-title>
-                <mat-panel-description>
-                    {{isQuestionCount() ? questionCount() : 'seleccionar cantidad de preguntas'}}
-                    <!-- <mat-icon>date_range</mat-icon> -->
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-                
-                <div class="w-full h-full flex flex-wrap p-4">
-                    @for (q of cantidades; track $index) {
-                        @if (q === questionCount()) {
-                            <div class="w-fit py-2 px-4 rounded-md border m-1 hover:cursor-pointer bg-blue-500"
-                                (click)="handleNumberQuestionSelection(q)">{{ q }}
-                            </div>
-                        } @else {
-                            <div class="w-fit py-2 px-4 rounded-md border m-1 hover:cursor-pointer hover:bg-blue-500"
-                                (click)="handleNumberQuestionSelection(q)">{{ q }}
-                            </div>
-                        }
-                    }
-                </div>
-        </mat-expansion-panel>
-    </mat-accordion>
+    <!-- Cantidad -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-gray-700">Cantidad de preguntas</label>
+      <div class="flex flex-wrap gap-2">
+        @for (qty of quantities; track qty) {
+          <button
+            (click)="selectedAmount.set(qty)"
+            [ngClass]="{
+              'bg-blue-600 text-white': selectedAmount() === qty,
+              'bg-gray-100 text-gray-800': selectedAmount() !== qty
+            }"
+            class="px-4 py-1.5 rounded-full border border-gray-300 text-sm transition cursor-pointer"
+          >
+            {{ qty }}
+          </button>
+        }
+      </div>
+    </div>
 
-   
-    <button
-        class="mt-6 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
-        (click)="startGame()"> Comenzar
-    </button>
-</section>
-
+    <!-- CTA -->
+    <div>
+      <button
+        (click)="startGame()"
+        [disabled]="!canStart()"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        🚀 Comenzar juego
+      </button>
+    </div>
+  </section>
+</div>

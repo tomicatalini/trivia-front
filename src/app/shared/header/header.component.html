@@ -10,6 +10,11 @@
         }
 
         <button class="p-2 mf-1 flex flex-col justify-center hover:cursor-pointer hover:bg-blue-200" 
+            (click)="about()">
+            <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="question_mark" class="cursor-pointer"></mat-icon>
+        </button>
+
+        <button class="p-2 mf-1 flex flex-col justify-center hover:cursor-pointer hover:bg-blue-200" 
             (click)="logout()">
             <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="logout" class="cursor-pointer"></mat-icon>
         </button>

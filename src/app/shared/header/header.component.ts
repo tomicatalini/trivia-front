@@ -27,4 +27,8 @@ export class HeaderComponent {
     this.auth.logout();
     this.router.navigate(['/']);
   }
+  
+  about(){
+    this.router.navigate(['/home/about']);
+  }
 }

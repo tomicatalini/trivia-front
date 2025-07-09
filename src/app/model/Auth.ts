@@ -3,5 +3,6 @@ export interface Auth {
   username: string;
   email: string;
   authenticated: Boolean,
-  admin: Boolean
+  admin: Boolean,
+  expiration: Date;
 }

@@ -4,11 +4,14 @@ import { Quiz } from "./Quiz";
 
 export interface Game {
     gameId: Number,
-    score: Number,
     startDate: Date,
     endDate: Date,
+    mode: String,
+    numberOfQuestions: Number,
+    time: Number,
+    score: Number,
     userId: Number,
     quizId: Number,
     category: Category,
-    gameQuestions: GameQuestion[]
+    gameQuestions: GameQuestion[],
 }

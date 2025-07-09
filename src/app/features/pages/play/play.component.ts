@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { TriviaService } from '../../../core/services/trivia.service';
 import { map } from 'rxjs';
 import { TimeBarComponent } from '../../../shared/components/time-bar/time-bar.component';
+import { gameModeString } from '../../../shared/functions/utils';
 
 @Component({
   selector: 'app-play',
@@ -25,6 +26,8 @@ export class PlayComponent {
   currentIndex = signal(0);
   selectedAnswer = signal<Answer | null>(null);
 
+  currentGameMode = computed(() => gameModeString(this.game()?.mode || 'UNKNOWN'));
+
   currentGameQuestion = computed(() =>
     this.game()?.gameQuestions![this.currentIndex()]
   );
@@ -40,6 +43,7 @@ export class PlayComponent {
   numberCorrectAnswers = signal(0);
 
   currentTime = signal(0);
+  totalTime = signal(0);
   timerInterval: any;
 
   constructor(){}
@@ -57,6 +61,7 @@ export class PlayComponent {
       clearInterval(this.timerInterval);
       this.timerInterval = setInterval(() => {
         this.currentTime.update(t => t + 1);
+        this.totalTime.update(t => t + 1);
       }, 1000);
     }
   }
@@ -97,8 +102,11 @@ export class PlayComponent {
       .pipe(
         map(response => response.result)
       )
-      .subscribe(score => {
-        game.score = score;
+      .subscribe(resume => {
+        game.mode = resume.mode;
+        game.score = resume.score;
+        game.numberOfQuestions = resume.numberOfQuestions;
+        game.time = resume.time;
         this.gameService.setGame(game);
         this.router.navigate(['/home/resume']);
       });

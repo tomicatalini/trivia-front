@@ -1,116 +1,63 @@
+import { Component, inject, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {MatSelectModule} from '@angular/material/select';
-import { MatOptionModule, provideNativeDateAdapter } from '@angular/material/core';
-import {MatButtonModule} from '@angular/material/button';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatAccordion, MatExpansionModule} from '@angular/material/expansion';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import { Quiz } from '../../../model/Quiz';
-import { TriviaService } from '../../../core/services/trivia.service';
-import { GameService } from '../../../core/services/game.service';
-import { Category } from '../../../model/Category';
-import { map } from 'rxjs';
-import { Auth } from '../../../model/Auth';
 import { Router } from '@angular/router';
-
-interface GameMode {
-  name: String,
-  field: String,
-  description: String
-}
+import { gameModes, gameModeString, questionQuantity } from '../../../shared/functions/utils';
+import { TriviaService } from '../../../core/services/trivia.service';
+import { Quiz } from '../../../model/Quiz';
+import { map } from 'rxjs';
+import { Category } from '../../../model/Category';
+import { GameService } from '../../../core/services/game.service';
+import { Auth } from '../../../model/Auth';
 
 @Component({
-  selector: 'app-setup',
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatButtonModule,
-    MatExpansionModule,
-    MatIconModule,
-    MatInputModule,
-    MatDatepickerModule,
-  ],
-  templateUrl: './setup.component.html',
   standalone: true,
-  providers: [provideNativeDateAdapter()],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-setup',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './setup.component.html',
 })
 export class SetupComponent {
-  modos: GameMode[] = [
-      { name: 'EASY', field: 'Fácil', description: 'Preguntas fáciles para comenzar.' },
-      { name: 'MEDIUM', field: 'Medio', description: 'Un desafío equilibrado.' },
-      { name: 'HARD', field: 'Difícil', description: 'Solo para expertos.' },
-      { name: 'RANDOM', field: 'Aleatorio', description: 'Dificultad aleatoria.' },
-      { name: 'EASY_TO_HARD', field: 'Fácil a Difícil', description: 'Simula "¿Quién quiere ser millonario?" con 15 preguntas.' }
-  ];
+  private router = inject(Router);
+  private triviaService = inject(TriviaService);
+  private gameService = inject(GameService);
 
-  cantidades: Number[] = [5, 10, 15, 20, 25];
-
-  accordion = viewChild.required(MatAccordion);
-
-  quizList = signal<Quiz[]>([]);
-  selectedQuiz = signal<Quiz | null>(null);
-
-  categoryList = signal<Category[]>([]);
+  sources = signal<Quiz[]>([]);
+  categories = signal<Category[]>([]);
+  
+  selectedSource = signal<Quiz | null>(null);
   selectedCategory = signal<Category | null>(null);
+  selectedMode = signal<string>('RANDOM');
+  selectedAmount = signal<number>(10);
 
-  gameMode = signal<GameMode | null>(this.modos[0]);
-  questionCount = signal<Number | null>(this.cantidades[0]);
- 
-  readonly isQuizAvailable = computed(() => this.selectedQuiz() != null);
-  readonly isSingleQuiz = computed(() => this.quizList().length === 1);
-  readonly isMultipleQuiz = computed(() => this.quizList().length > 1);
+  modes: string[] = gameModes();
+  quantities: number[] = questionQuantity();
 
-  readonly isCategoryAvailable = computed(() => this.selectedCategory() != null);
-  readonly hasCategories = computed(() => this.categoryList().length > 0);
+  constructor() {
+    this.loadSources();
 
-  readonly isGameModeAvailable = computed(() => this.gameMode() != null);
-  readonly isQuestionCount = computed(() => this.questionCount() != null);
-
-  constructor(
-    private triviaService: TriviaService,
-    private gameService: GameService,
-    private router: Router,
-  ) {
-    this.loadQuizzes();
-
-    // Reactivamente, cuando cambia el quiz seleccionado, cargar categorías
+    // Actualizar categorías cuando cambia la fuente
     effect(() => {
-      const quiz = this.selectedQuiz();
-      if (quiz) {
-        this.loadCategories(quiz.id);
-      } else {
-        this.categoryList.set([]);
-      }
+      const source = this.selectedSource();
+      if (source) this.loadCategories(source.id);
     });
   }
 
-
-  loadQuizzes() {
+  loadSources() {
     this.triviaService.getAllQuizzies()
       .pipe(
         map(response => !!response.result ? response.result as Quiz[] : [])
       )
-      .subscribe(quizzes => {
-        this.quizList.set(quizzes);
+      .subscribe(sources => {
+        this.sources.set(sources);
 
-        if (quizzes.length === 0) {
-          this.selectedQuiz.set(null);
-        } else if (quizzes.length === 1) {
-          this.selectedQuiz.set(quizzes[0]);
+        if (sources.length === 1) {
+          this.selectedSource.set(sources[0]);
         }
       });
   }
 
-  loadCategories(quizId: Number) {
-    this.triviaService.getAllCategories(quizId)
+  loadCategories(sourceId: number | Number) {
+    this.triviaService.getAllCategories(sourceId)
       .pipe(
         map(response => !!response.result ? response.result as Category[] : [])
       )
@@ -123,22 +70,33 @@ export class SetupComponent {
           this.selectedCategory.set(categories[0]);
         }
 
-        this.categoryList.set(categories);
+        this.categories.set(categories);
       });
   }
 
-  startGame() {
-    const quiz = this.selectedQuiz();
-    const category = this.selectedCategory();
-    const mode = this.gameMode();
-    const count = this.questionCount();
+  formatMode(mode: string): string {
+    return gameModeString(mode);
+  }
 
-    if (!quiz || !category || !mode || !count) return;
+  canStart = computed(() =>
+    !!this.selectedSource() &&
+    !!this.selectedCategory() &&
+    !!this.selectedMode() &&
+    !!this.selectedAmount()
+  );
+
+  startGame() {
+    const src = this.selectedSource();
+    const category = this.selectedCategory();
+    const mode = this.selectedMode();
+    const count = this.selectedAmount();
+
+    if (!src || !category || !mode || !count) return;
 
     const auth = JSON.parse(localStorage.getItem('auth_user')!) as Auth;
     
     this.triviaService
-      .startGame(quiz.id, auth.userId, category.id, mode.name, count)
+      .startGame(src.id, auth.userId, category.id, mode, count)
       .pipe(
         map(response => response.result)
       )
@@ -151,17 +109,4 @@ export class SetupComponent {
           }
       });
   }
-
-  handleCategorySelection(category: Category): void {
-    this.selectedCategory.set(category);
-  }
-
-  handleGameModeSelection(gameMode: GameMode): void {
-    this.gameMode.set(gameMode);
-  }
-
-  handleNumberQuestionSelection(number: Number): void {
-    this.questionCount.set(number);
-  }
-
 }

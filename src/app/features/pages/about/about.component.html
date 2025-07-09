@@ -1,0 +1,161 @@
+<section class="max-w-5xl mx-auto px-4 py-8 text-left">
+    <h1 class="text-4xl font-bold text-primary text-center mb-8">📘 Proyecto</h1>
+
+    <article class="prose max-w-none bg-gray-50 rounded-2xl p-6 shadow text-sm leading-relaxed mb-4">
+        <h2 class="text-xl font-bold mb-4">📄 Trabajo práctico final – Taller de Programación – UTN – FRCU</h2>
+
+        <h3 class="font-bold text-lg my-2">Introducción</h3>
+        <p class="mb-2">
+            El trabajo práctico final consta de la realización de una aplicación de cuestionarios.
+        </p>
+        <p class="mb-2">
+            La aplicación deberá ser capaz de presentar al usuario diferentes preguntas con opciones de múltiples respuesta o multiple choice, donde el usuario deberá seleccionará una respuesta para continuar con la próxima pregunta. Al final del cuestionario se le mostrará el puntaje obtenido en  base  a  diferentes  conceptos,  por  ejemplo  cantidad de respuestas  correctas, tiempo insumido, etc.
+        </p>
+
+        <h3 class="font-bold text-lg my-2">Requerimientos funcionales</h3>
+
+        <h4 class="font-bold text-md my-2">Funcionalidad administrativa</h4>
+        <p class="mb-2">
+            El objetivo de la funcionalidad administrativa es persistir internamente en la aplicación los diferentes conjuntos de preguntas/respuestas a ser utilizados en la funcionalidad operativa.  
+            Un conjunto es una agrupación de preguntas/respuestas con el mismo origen. Las preguntas deberán pertenecer a una categoría (por ejemplo deportes, artes, etc.), tener niveles de dificultad (alto, medio, bajo) y múltiples respuestas asociadas.
+        </p>
+        <p class="mb-2">
+            En la aplicación podrían haber muchos conjuntos, pero el único requerido es el conjunto de preguntas del sitio <strong>opentdb</strong>.
+        </p>
+        <p class="mb-2">
+            Opentdb (Open Trivia DataBase - <a href="https://opentdb.com/" target="_blank">https://opentdb.com/</a>) es un sitio de internet  el cual posee datos de diferentes trivias las que pueden ser inspeccionadas y también modificadas en forma on-line.
+            Este sitio permite además descargar las trivias mediante una API de fácil utilización devolviendo los datos en formato JSON (JavaScript Object Notation). A continuación se encuentra el link de acceso a la documentación de la API:           
+        </p>
+        <p class="font-mono bg-gray-200 p-2 rounded my-4 text-center">
+            <a href="https://opentdb.com/api_config.php" target="_blank">https://opentdb.com/api_config.php</a>
+        </p>
+        <p class="mb-2">
+            Utilizaremos esta funcionalidad con el fin de obtener un conjunto de trivias para ser incorporadas a la aplicación. Un ejemplo de cómo acceder a los datos de estas trivias desde una aplicación C# lo podemos encontrar en el siguiente repositorio de GitHub:  
+        </p>
+        <p class="font-mono bg-gray-200 p-2 rounded my-4 text-center">
+            <a href="https://github.com/utn-frcu-isi-tdp/opentdb-test-client" target="_blank">https://github.com/utn-frcu-isi-tdp/opentdb-test-client</a>
+        </p>
+        <p class="mb-2">
+            Un usuario administrativo de la aplicación deberá poder realizar importación de datos de las trivias disponibles, persistiéndolas internamente y asociándolas al conjunto de preguntas de Opentdb.  
+            Como los datos de este sitio se encuentran en constante cambio, una vez realizada la importación se debe poder actualizar el set de preguntas cuando el usuario lo requiera. La única limitación a este proceso que debe implementarse es que una vez importada una pregunta no puede ser modificada, ni la pregunta en sí, ni sus respuestas.
+        </p>
+
+        <h4 class="font-bold text-md my-2">Funcionalidad operativa</h4>
+        <p class="mb-2">
+            La funcionalidad operativa tiene como objetivo mostrar las preguntas al usuario e ir registrando las respuestas.
+        </p>
+        <p class="mb-2">
+            Un usuario operativo al iniciar la interacción con la aplicación deberá identificarse o seleccionarse para que de esa manera la sesión de respuestas esté relacionada con él mismo.
+        </p>
+        <p class="mb-2">
+            El usuario deberá poder seleccionar el conjunto de preguntas que querrá utilizar, si solamente existe un conjunto, se seleccionará automáticamente el existente.
+        </p>
+        <p class="mb-2">
+            A continuación el usuario deberá:
+        </p>
+        <ul class="my-2 ml-4">
+            <li> 🔹 Seleccionar la categoría de las preguntas.</li>
+            <li> 🔹 Elegir el nivel de dificultad de las preguntas.</li>
+            <li> 🔹 Seleccionar la cantidad de preguntas a contestar, que como mínimo deberán ser 10.</li>
+        </ul>
+        <p class="mb-2">
+            Una vez configurada la sesión el usuario podrá iniciar el cuestionario, al hacerlo se le presentarán secuencialmente preguntas a ser respondidas. Estas preguntas el sistema las seleccionará aleatoriamente de las persistidas internamente en base al conjunto de preguntas seleccionado, a la categoría elegida, el nivel y la cantidad de preguntas.
+        </p>
+        <p class="mb-2">
+            Al usuario al comenzar con el examen se le presentará un reloj indicativo de tiempo insumido actual.
+        </p>
+        <p class="mb-2">
+            Al finalizar el cuestionario, el sistema debe establecer un puntaje a la sesión el cual estará dado por la siguiente fórmula:
+        </p>
+        <p class="font-mono bg-gray-200 p-2 rounded my-4">
+            Puntaje = cantidad de respuestas correctas / cantidad de preguntas * factor dificultad * factor tiempo
+        </p>
+        <p class="mb-2">
+            Donde:
+        </p>
+        <ul class="my-2 ml-4">
+            <li><strong>Factor dificultad:</strong>
+            <ul class="my-2 ml-4">
+                <li> 🔹 alto: 5 puntos</li>
+                <li> 🔹 medio: 3 puntos</li>
+                <li> 🔹 bajo: 1 punto</li>
+            </ul>
+            </li>
+            <li><strong>Factor tiempo:</strong> si tiempo total insumido / cantidad de preguntas
+            <ul class="my-2 ml-4">
+                <li> 🔹 menor a 5 segundos: 5 puntos</li>
+                <li> 🔹 entre 5 y 20 segundos: 3 puntos</li>
+                <li> 🔹mayor a 20 segundos: 1 punto</li>
+            </ul>
+            </li>
+        </ul>
+        <p class="mb-2">
+            El usuario podrá visualizar un ranking que muestre las 20 mejores sesiones en cuanto a su puntaje mostrando la siguiente información:
+        </p>
+        <ul class="my-2 ml-4">
+            <li> 🔹 usuario</li>
+            <li> 🔹 puntaje</li>
+            <li> 🔹 tiempo</li>
+            <li> 🔹 fecha</li>
+        </ul>
+
+        <h3 class="font-bold text-lg my-2">Requerimientos no funcionales</h3>
+        <ul class="my-2 ml-4">
+            <li> - La aplicación deberá ser robusta ante cualquier tipo de errores.</li>
+            <li> - La aplicación deberá ser fácil de usar e intuitiva.</li>
+            <li> - La interfaz del usuario deberá ser consistente y no deberá tener errores de interacción ni de visualización.</li>
+            <li> - La aplicación deberá ser desarrollada sobre la plataforma .NET y en lenguaje C#.</li>
+            <li> - El programa deberá tener una interfaz gráfica, se sugiere el uso de WinForms.</li>
+            <li> - La incorporación de conocimientos no adquiridos durante la cátedra será también bienvenida.</li>
+            <li> - El programa deberá persistir las configuraciones y otros datos en una Base de Datos relacional.</li>
+            <li> - La aplicación deberá contener una bitácora de monitoreo (archivo de log).</li>
+            <li> - Se espera que en el futuro existan más conjuntos de preguntas disponibles en la aplicación.</li>
+            <li> - El sistema deberá estar diseñado para que los cambios requeridos sean mínimos.</li>
+            <li> - El código fuente deberá estar correctamente comentado y documentado.</li>
+        </ul>
+
+        <h3 class="font-bold text-lg my-2">Entregables</h3>
+        <ul class="my-2 ml-4">
+            <li> - Código ejecutable</li>
+            <li> - Código fuente</li>
+            <li> - Diagrama de clases y paquetes en formato digital (UML)</li>
+            <li> - Guía de instalación y uso del programa</li>
+        </ul>
+        <p class="mb-2"><strong>Importante:</strong> Se debe entregar todos los elementos mencionados en un CD al momento de la defensa.</p>
+
+        <h3 class="font-bold text-lg my-2">Evaluación</h3>
+        <p class="mb-2">
+            Se evaluará el uso de buenas técnicas de desarrollo y documentación, legibilidad del código, utilización correcta del lenguaje y la resolución empleada para satisfacer los requerimientos.
+        </p>
+        <p class="mb-2">
+            Se deberá realizar una defensa grupal e individual del trabajo, explicando la solución y respondiendo preguntas del equipo docente.
+        </p>
+    </article>
+
+    <!-- Cumplimiento -->
+    <section class="prose max-w-none bg-gray-50 rounded-2xl p-6 shadow text-sm leading-relaxed mb-4">
+        <h2 class="text-xl font-bold mb-4">✅ Objetivos cumplidos</h2>
+        <ul class="list-disc pl-5 space-y-1 text-sm">
+        <li>✔️ Selección de conjunto de preguntas (OpenTDB y otros)</li>
+        <li>✔️ Filtros por categoría, dificultad y cantidad</li>
+        <li>✔️ Puntaje final con fórmula oficial (correctas, tiempo, dificultad)</li>
+        <li>✔️ Ranking de sesiones con usuario, puntaje, tiempo y fecha</li>
+        <li>✔️ Persistencia en base de datos relacional</li>
+        <li>✔️ Interfaz moderna, clara y adaptable</li>
+        <li>✔️ Sesiones vinculadas a usuario identificado</li>
+        </ul>
+    </section>
+
+    <!-- Mejoras -->
+    <section class="prose max-w-none bg-gray-50 rounded-2xl p-6 shadow text-sm leading-relaxed mb-4">
+        <h2 class="text-xl font-bold mb-4">🚀 Mejoras implementadas</h2>
+        <ul class="list-disc pl-5 space-y-1 text-sm">
+            <li>🔹 Angular 19 con componentes standalone y Signals</li>
+            <li>🔹 Estilos con TailwindCSS + Material</li>
+            <li>🔹 Modo de juego "de fácil a difícil" (no requerido)</li>
+            <li>🔹 Animaciones suaves y experiencia fluida</li>
+            <li>🔹 Módulo de configuración con selección guiada</li>
+            <li>🔹 Preparado para futuras fuentes y modos de persistencia</li>
+        </ul>
+    </section>
+</section>

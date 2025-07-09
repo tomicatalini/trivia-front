@@ -6,6 +6,7 @@ import { PlayComponent } from '../../features/pages/play/play.component';
 import { DashboardComponent } from '../../features/pages/dashboard/dashboard.component';
 import { ResumeComponent } from '../../features/pages/resume/resume.component';
 import { RankingComponent } from '../../features/pages/ranking/ranking.component';
+import { AboutComponent } from '../../features/pages/about/about.component';
 
 export const HOME_ROUTES: Routes = [
   {
@@ -18,6 +19,7 @@ export const HOME_ROUTES: Routes = [
       { path: 'how-to', component: HowToComponent },
       { path: 'play', component: PlayComponent },
       { path: 'resume', component: ResumeComponent },
+      { path: 'about', component: AboutComponent},
     ]
   }
 ];
